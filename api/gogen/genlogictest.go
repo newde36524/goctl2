@@ -63,7 +63,7 @@ func genLogicByRouteTest(dir, rootPkg string, cfg *config.Config, group spec.Gro
 	return genFile(fileGenConfig{
 		dir:             dir,
 		subdir:          subDir,
-		filename:        goFile + ".go",
+		filename:        goFile + "_test.go",
 		templateName:    "logicTemplate",
 		category:        category,
 		templateFile:    logicTemplateTestFile,

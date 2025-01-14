@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
+import "github.com/newde36524/goctl2/pkg/parser/api/token"
 
 // AtServerStmt represents @server statement.
 type AtServerStmt struct {

@@ -5,12 +5,12 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/newde36524/goctl2/api/spec"
+	"github.com/newde36524/goctl2/pkg/parser/api/ast"
+	"github.com/newde36524/goctl2/pkg/parser/api/importstack"
+	"github.com/newde36524/goctl2/pkg/parser/api/placeholder"
+	"github.com/newde36524/goctl2/pkg/parser/api/token"
 	"github.com/zeromicro/go-zero/core/lang"
-	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
-	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/ast"
-	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/importstack"
-	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/placeholder"
-	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
 )
 
 // Analyzer analyzes the ast and converts it to spec.

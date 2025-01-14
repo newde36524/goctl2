@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/newde36524/goctl2/config"
+	"github.com/newde36524/goctl2/model/sql/gen"
+	"github.com/newde36524/goctl2/util/pathx"
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/tools/goctl/config"
-	"github.com/zeromicro/go-zero/tools/goctl/model/sql/gen"
-	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 var (

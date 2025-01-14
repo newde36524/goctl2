@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
+import "github.com/newde36524/goctl2/pkg/parser/api/token"
 
 // ImportStmt represents an import statement.
 type ImportStmt interface {

@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"runtime"
 
+	"github.com/newde36524/goctl2/internal/version"
 	"github.com/spf13/cobra"
-	"github.com/zeromicro/go-zero/tools/goctl/internal/version"
 )
 
 const (

@@ -3,7 +3,7 @@ package util
 import (
 	"testing"
 
-	"github.com/zeromicro/go-zero/tools/goctl/test"
+	"github.com/newde36524/goctl2/test"
 )
 
 func TestIsTemplate(t *testing.T) {

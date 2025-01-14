@@ -14,9 +14,9 @@ import (
 	"time"
 
 	"github.com/gookit/color"
+	"github.com/newde36524/goctl2/util/console"
+	"github.com/newde36524/goctl2/util/ctx"
 	"github.com/spf13/cobra"
-	"github.com/zeromicro/go-zero/tools/goctl/util/console"
-	"github.com/zeromicro/go-zero/tools/goctl/util/ctx"
 )
 
 const defaultMigrateVersion = "v1.3.0"

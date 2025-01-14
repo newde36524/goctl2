@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	conf "github.com/zeromicro/go-zero/tools/goctl/config"
-	"github.com/zeromicro/go-zero/tools/goctl/rpc/parser"
-	"github.com/zeromicro/go-zero/tools/goctl/util"
-	"github.com/zeromicro/go-zero/tools/goctl/util/format"
-	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
-	"github.com/zeromicro/go-zero/tools/goctl/util/stringx"
+	conf "github.com/newde36524/goctl2/config"
+	"github.com/newde36524/goctl2/rpc/parser"
+	"github.com/newde36524/goctl2/util"
+	"github.com/newde36524/goctl2/util/format"
+	"github.com/newde36524/goctl2/util/pathx"
+	"github.com/newde36524/goctl2/util/stringx"
 )
 
 //go:embed main.tpl

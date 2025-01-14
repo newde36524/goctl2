@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/newde36524/goctl2/api/gogen"
+	conf "github.com/newde36524/goctl2/config"
+	"github.com/newde36524/goctl2/util"
+	"github.com/newde36524/goctl2/util/pathx"
 	"github.com/spf13/cobra"
-	"github.com/zeromicro/go-zero/tools/goctl/api/gogen"
-	conf "github.com/zeromicro/go-zero/tools/goctl/config"
-	"github.com/zeromicro/go-zero/tools/goctl/util"
-	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 //go:embed api.tpl

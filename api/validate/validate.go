@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/gookit/color"
+	"github.com/newde36524/goctl2/api/parser"
 	"github.com/spf13/cobra"
-	"github.com/zeromicro/go-zero/tools/goctl/api/parser"
 )
 
 // VarStringAPI describes an API.

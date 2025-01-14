@@ -8,12 +8,12 @@ import (
 	"path"
 	"strings"
 
-	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
-	apiutil "github.com/zeromicro/go-zero/tools/goctl/api/util"
-	"github.com/zeromicro/go-zero/tools/goctl/config"
-	"github.com/zeromicro/go-zero/tools/goctl/internal/version"
-	"github.com/zeromicro/go-zero/tools/goctl/util"
-	"github.com/zeromicro/go-zero/tools/goctl/util/format"
+	"github.com/newde36524/goctl2/api/spec"
+	apiutil "github.com/newde36524/goctl2/api/util"
+	"github.com/newde36524/goctl2/config"
+	"github.com/newde36524/goctl2/internal/version"
+	"github.com/newde36524/goctl2/util"
+	"github.com/newde36524/goctl2/util/format"
 )
 
 const typesFile = "types"

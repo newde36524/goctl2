@@ -1,4 +1,4 @@
-module github.com/zeromicro/go-zero/tools/goctl
+module github.com/newde36524/goctl2
 
 go 1.21
 

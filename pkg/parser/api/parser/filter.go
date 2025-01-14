@@ -3,8 +3,8 @@ package parser
 import (
 	"fmt"
 
-	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/ast"
-	"github.com/zeromicro/go-zero/tools/goctl/pkg/parser/api/token"
+	"github.com/newde36524/goctl2/pkg/parser/api/ast"
+	"github.com/newde36524/goctl2/pkg/parser/api/token"
 )
 
 type filterBuilder struct {

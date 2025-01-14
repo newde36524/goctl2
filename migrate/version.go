@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zeromicro/go-zero/tools/goctl/util/console"
+	"github.com/newde36524/goctl2/util/console"
 )
 
 var client = http.Client{

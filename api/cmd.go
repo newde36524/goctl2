@@ -1,20 +1,20 @@
 package api
 
 import (
+	"github.com/newde36524/goctl2/api/apigen"
+	"github.com/newde36524/goctl2/api/dartgen"
+	"github.com/newde36524/goctl2/api/docgen"
+	"github.com/newde36524/goctl2/api/format"
+	"github.com/newde36524/goctl2/api/gogen"
+	"github.com/newde36524/goctl2/api/javagen"
+	"github.com/newde36524/goctl2/api/ktgen"
+	"github.com/newde36524/goctl2/api/new"
+	"github.com/newde36524/goctl2/api/tsgen"
+	"github.com/newde36524/goctl2/api/validate"
+	"github.com/newde36524/goctl2/config"
+	"github.com/newde36524/goctl2/internal/cobrax"
+	"github.com/newde36524/goctl2/plugin"
 	"github.com/spf13/cobra"
-	"github.com/zeromicro/go-zero/tools/goctl/api/apigen"
-	"github.com/zeromicro/go-zero/tools/goctl/api/dartgen"
-	"github.com/zeromicro/go-zero/tools/goctl/api/docgen"
-	"github.com/zeromicro/go-zero/tools/goctl/api/format"
-	"github.com/zeromicro/go-zero/tools/goctl/api/gogen"
-	"github.com/zeromicro/go-zero/tools/goctl/api/javagen"
-	"github.com/zeromicro/go-zero/tools/goctl/api/ktgen"
-	"github.com/zeromicro/go-zero/tools/goctl/api/new"
-	"github.com/zeromicro/go-zero/tools/goctl/api/tsgen"
-	"github.com/zeromicro/go-zero/tools/goctl/api/validate"
-	"github.com/zeromicro/go-zero/tools/goctl/config"
-	"github.com/zeromicro/go-zero/tools/goctl/internal/cobrax"
-	"github.com/zeromicro/go-zero/tools/goctl/plugin"
 )
 
 var (

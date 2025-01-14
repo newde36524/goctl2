@@ -4,8 +4,8 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/zeromicro/go-zero/tools/goctl/internal/version"
-	"github.com/zeromicro/go-zero/tools/goctl/util"
+	"github.com/newde36524/goctl2/internal/version"
+	"github.com/newde36524/goctl2/util"
 )
 
 // Customized defines a template for customized in model

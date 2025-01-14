@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/zeromicro/go-zero/tools/goctl/internal/cobrax"
-	"github.com/zeromicro/go-zero/tools/goctl/model/mongo"
-	"github.com/zeromicro/go-zero/tools/goctl/model/sql/command"
+	"github.com/newde36524/goctl2/internal/cobrax"
+	"github.com/newde36524/goctl2/model/mongo"
+	"github.com/newde36524/goctl2/model/sql/command"
 )
 
 var (

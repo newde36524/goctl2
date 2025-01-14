@@ -5,8 +5,8 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/zeromicro/go-zero/tools/goctl/util/env"
-	"github.com/zeromicro/go-zero/tools/goctl/vars"
+	"github.com/newde36524/goctl2/util/env"
+	"github.com/newde36524/goctl2/vars"
 )
 
 const goproxy = "GOPROXY=https://goproxy.cn,direct"

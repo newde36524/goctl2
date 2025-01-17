@@ -7,15 +7,14 @@ package testlogic
 import (
 	"context"
 	{{if .HasResp}}"encoding/json"{{end}}
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"app-server/api/{{.ProjectName}}/internal/config"
-	{{if .NoTypes}}"app-server/api/{{.ProjectName}}/internal/types"{{end}}
-
+	{{if .HasRequest}}{{if .NoTypes}}"app-server/api/{{.ProjectName}}/internal/types"{{end}} {{end}}
 	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/core/logx"
 
 	{{.ImportPackages}}
 )
@@ -47,7 +46,7 @@ func Test_{{.function}}(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "userId", int64(1101001))
 	l := {{.LogicName}}.New{{.logic}}(ctx, svcCtx)
 	{{if .HasResp}}resp ,{{end}}err := l.{{.Call}}({{if .HasRequest}}&types.{{.RequestType}}{}{{end}})
-	{{if .HasResp}}logx.Debug(toJson(resp ,err)){{else}}if err != nil {
-		logx.Error(err)
+	{{if .HasResp}}fmt.Println(toJson(resp ,err)){{else}}if err != nil {
+		fmt.Println(err)
 	}{{end}}
 }

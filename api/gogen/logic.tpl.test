@@ -13,8 +13,8 @@ import (
 	"testing"
 
 	"app-server/api/{{.ProjectName}}/internal/config"
-	{{if .HasRequest}}"app-server/api/{{.ProjectName}}/internal/types"{{else}}
-	{{if .HasResp}}"app-server/api/{{.ProjectName}}/internal/types"{{end}}
+	{{if .HasRequest}}{{if .NoTypes}}"app-server/api/{{.ProjectName}}/internal/types"{{end}}{{else}}
+	{{if .HasResp}}{{if .NoTypes}}"app-server/api/{{.ProjectName}}/internal/types"{{end}}{{end}}
 	{{end}}
 	"github.com/zeromicro/go-zero/core/conf"
 

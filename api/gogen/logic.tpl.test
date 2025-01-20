@@ -23,32 +23,38 @@ import (
 
 // nolint: staticcheck
 func Test_{{.function}}(t *testing.T) {
-	getFilePath := func(rootDir string, subPath ...string) string {
-		base := os.Args[0]
-		for {
-			base = filepath.Dir(base)
-			if filepath.Base(base) == rootDir {
-				elems := []string{base}
-				return filepath.Join(append(elems, subPath...)...)
-			}
-			if len(filepath.Base(base)) == 0 {
-				return ""
+	var (
+		getFilePath = func(rootDir string, subPath ...string) string {
+			base := os.Args[0]
+			for {
+				base = filepath.Dir(base)
+				if filepath.Base(base) == rootDir {
+					elems := []string{base}
+					return filepath.Join(append(elems, subPath...)...)
+				}
+				if len(filepath.Base(base)) == 0 {
+					return ""
+				}
 			}
 		}
-	}
-	{{if .HasResp}}toJson := func(resp {{.ResponseType}},err error) (string, error){
-		bs, _ := json.Marshal(resp) //nolint:errchkjson
-		return string(bs), err
-	}{{end}}
-	var configFile = getFilePath("{{.ProjectName}}", "etc", "{{.ProjectName}}-dev.yaml")
-	var c config.Config
+		{{if .HasResp}}toJson = func(resp {{.ResponseType}}) (string, error){
+			bs, err := json.Marshal(resp) //nolint:errchkjson
+			return string(bs), err
+		}{{end}}
+		configFile = getFilePath("{{.ProjectName}}", "etc", "{{.ProjectName}}-dev.yaml")
+		c          config.Config
+	)
 	conf.MustLoad(configFile, &c)
-	svcCtx := svc.NewServiceContext(c)
+	svcCtx, ctx := svc.NewServiceContext(c), context.WithValue(context.Background(), "userId", int64(1101001))
 
-	ctx := context.WithValue(context.Background(), "userId", int64(1101001))
 	l := {{.LogicName}}.New{{.logic}}(ctx, svcCtx)
 	{{if .HasResp}}resp ,{{end}}err := l.{{.Call}}({{if .HasRequest}}&types.{{.RequestType}}{}{{end}})
-	{{if .HasResp}}fmt.Println(toJson(resp ,err)){{else}}if err != nil {
+	{{if .HasResp}}fmt.Println(toJson(resp))
+	if err != nil {
 		fmt.Println(err)
+		t.Failed()
+	}{{else}}if err != nil {
+		fmt.Println(err)
+		t.Failed()
 	}{{end}}
 }

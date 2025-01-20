@@ -45,7 +45,7 @@ func Test_{{.function}}(t *testing.T) {
 		c          config.Config
 	)
 	conf.MustLoad(configFile, &c)
-	svcCtx, ctx := svc.NewServiceContext(c), context.WithValue(context.Background(), "userId", int64(1101001))
+	ctx, svcCtx := context.WithValue(context.Background(), "userId", int64(1101001)), svc.NewServiceContext(c)
 
 	l := {{.LogicName}}.New{{.logic}}(ctx, svcCtx)
 	{{if .HasResp}}resp ,{{end}}err := l.{{.Call}}({{if .HasRequest}}&types.{{.RequestType}}{}{{end}})

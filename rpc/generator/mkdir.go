@@ -13,16 +13,17 @@ import (
 )
 
 const (
-	wd       = "wd"
-	etc      = "etc"
-	internal = "internal"
-	config   = "config"
-	logic    = "logic"
-	server   = "server"
-	svc      = "svc"
-	pb       = "pb"
-	protoGo  = "proto-go"
-	call     = "call"
+	wd        = "wd"
+	etc       = "etc"
+	internal  = "internal"
+	config    = "config"
+	logic     = "logic"
+	logicTest = "logicTest"
+	server    = "server"
+	svc       = "svc"
+	pb        = "pb"
+	protoGo   = "proto-go"
+	call      = "call"
 )
 
 type (
@@ -33,6 +34,7 @@ type (
 		GetInternal() Dir
 		GetConfig() Dir
 		GetLogic() Dir
+		GetLogicTest() Dir
 		GetServer() Dir
 		GetSvc() Dir
 		GetPb() Dir
@@ -65,6 +67,7 @@ func mkdir(ctx *ctx.ProjectContext, proto parser.Proto, conf *conf.Config, c *ZR
 	internalDir := filepath.Join(ctx.WorkDir, "internal")
 	configDir := filepath.Join(internalDir, "config")
 	logicDir := filepath.Join(internalDir, "logic")
+	logicTestDir := filepath.Join(internalDir, "logic.Test")
 	serverDir := filepath.Join(internalDir, "server")
 	svcDir := filepath.Join(internalDir, "svc")
 	pbDir := filepath.Join(ctx.WorkDir, proto.GoPackage)
@@ -157,6 +160,14 @@ func mkdir(ctx *ctx.ProjectContext, proto parser.Proto, conf *conf.Config, c *ZR
 			return getChildPackage(logicDir, childPath)
 		},
 	}
+	inner[logicTest] = Dir{
+		Filename: logicTestDir,
+		Package:  filepath.ToSlash(filepath.Join(ctx.Path, strings.TrimPrefix(logicTestDir, ctx.Dir))),
+		Base:     filepath.Base(logicTestDir),
+		GetChildPackage: func(childPath string) (string, error) {
+			return getChildPackage(logicTestDir, childPath)
+		},
+	}
 	inner[server] = Dir{
 		Filename: serverDir,
 		Package:  filepath.ToSlash(filepath.Join(ctx.Path, strings.TrimPrefix(serverDir, ctx.Dir))),
@@ -240,6 +251,10 @@ func (d *defaultDirContext) GetConfig() Dir {
 
 func (d *defaultDirContext) GetLogic() Dir {
 	return d.inner[logic]
+}
+
+func (d *defaultDirContext) GetLogicTest() Dir {
+	return d.inner[logicTest]
 }
 
 func (d *defaultDirContext) GetServer() Dir {

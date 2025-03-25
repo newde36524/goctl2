@@ -49,11 +49,12 @@ func Test_{{.function}}(t *testing.T) {
 
 	l := {{.LogicName}}.New{{.logic}}(ctx, svcCtx)
 	{{if .HasResp}}resp ,{{end}}err := l.{{.Call}}({{if .HasRequest}}&types.{{.RequestType}}{}{{end}})
-	{{if .HasResp}}fmt.Println(toJson(resp))
+	{{if .HasResp}}v, err := toJson(resp)
 	if err != nil {
 		fmt.Println(err)
 		t.Failed()
-	}{{else}}if err != nil {
+	}
+	fmt.Println(v){{else}}if err != nil {
 		fmt.Println(err)
 		t.Failed()
 	}{{end}}

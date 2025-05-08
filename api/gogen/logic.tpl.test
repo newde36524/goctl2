@@ -12,9 +12,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"app-server/api/{{.ProjectName}}/internal/config"
-	{{if .HasRequest}}{{if .NoTypes}}"app-server/api/{{.ProjectName}}/internal/types"{{end}}{{else}}
-	{{if .HasResp}}{{if .NoTypes}}"app-server/api/{{.ProjectName}}/internal/types"{{end}}{{end}}
+	{{.config}}
+	{{if .HasRequest}}{{if .NoTypes}}{{.types}}{{end}}{{else}}
+	{{if .HasResp}}{{if .NoTypes}}{{.types}}{{end}}{{end}}
 	{{end}}
 	"github.com/zeromicro/go-zero/core/conf"
 

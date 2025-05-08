@@ -2,6 +2,7 @@ package gogen
 
 import (
 	_ "embed"
+	"fmt"
 	"path"
 	"path/filepath"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"github.com/newde36524/goctl2/config"
 	"github.com/newde36524/goctl2/util"
 	"github.com/newde36524/goctl2/util/format"
+	"github.com/newde36524/goctl2/util/pathx"
 )
 
 //go:embed logic.tpl.test
@@ -88,6 +90,8 @@ func genLogicByRouteTest(dir, rootPkg string, cfg *config.Config, group spec.Gro
 			"HasResp":        len(route.ResponseTypeName()) > 0,
 			"HasRequest":     len(route.RequestTypeName()) > 0,
 			"doc":            getDoc(route.JoinedDoc()),
+			"config":         fmt.Sprintf("\"%s\"", pathx.JoinPackages(rootPkg, configDir)),
+			"types":          fmt.Sprintf("\"%s\"", pathx.JoinPackages(rootPkg, typesDir)),
 		},
 	})
 }

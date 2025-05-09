@@ -120,6 +120,7 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 				"request":      fmt.Sprintf("%s.%s", proto.PbPackage, parser.CamelCase(rpc.RequestType)),
 				"response":     fmt.Sprintf("*%s.%s", proto.PbPackage, parser.CamelCase(rpc.ReturnsType)),
 				"responseType": fmt.Sprintf("%s.%s", proto.PbPackage, parser.CamelCase(rpc.ReturnsType)),
+				"internal":     ctx.GetInternal().Package,
 			}, filename, false); err != nil {
 				return err
 			}

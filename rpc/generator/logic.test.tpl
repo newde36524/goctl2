@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"app-server/service/sys/internal/config"
-	{{.serviceName}}logic "app-server/service/{{.ProjectName}}/internal/logic/{{.serviceName}}"
+	"{{.internal}}/config"
+	{{.serviceName}}logic "{{.internal}}/logic/{{.serviceName}}"
 	{{.imports}}
 
 	"github.com/zeromicro/go-zero/core/conf"

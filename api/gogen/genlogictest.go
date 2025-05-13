@@ -62,6 +62,20 @@ func genLogicByRouteTest(dir, rootPkg string, cfg *config.Config, group spec.Gro
 	}
 	importPackages := genHandlerImports(group, route, rootPkg)
 	subDir := getLogicFolderPathTest(group, route)
+	var reqFeilds []string
+	structType, ok := route.RequestType.(spec.DefineStruct)
+	if ok {
+		for _, member := range structType.Members {
+			str := fmt.Sprintf("%s: %v,", member.Name, GetTypeDefaultValue(member.Type.Name()))
+			reqFeilds = append(reqFeilds, str)
+		}
+	}
+	reqFeildsStr := strings.Join(reqFeilds, "\n")
+	if len(reqFeilds) > 0 {
+		reqFeildsStr = "\n" + reqFeildsStr + "\n"
+	}
+	reqFeildsStr = "{" + reqFeildsStr + "}"
+
 	return genFile(fileGenConfig{
 		dir:             dir,
 		subdir:          subDir,
@@ -92,6 +106,7 @@ func genLogicByRouteTest(dir, rootPkg string, cfg *config.Config, group spec.Gro
 			"doc":            getDoc(route.JoinedDoc()),
 			"config":         fmt.Sprintf("\"%s\"", pathx.JoinPackages(rootPkg, configDir)),
 			"types":          fmt.Sprintf("\"%s\"", pathx.JoinPackages(rootPkg, typesDir)),
+			"reqFeilds":      reqFeildsStr,
 		},
 	})
 }
@@ -107,4 +122,33 @@ func getLogicFolderPathTest(group spec.Group, route spec.Route) string {
 	folder = strings.TrimPrefix(folder, "/")
 	folder = strings.TrimSuffix(folder, "/")
 	return path.Join(logicDirTest, folder)
+}
+
+func GetTypeDefaultValue(typeName string) string {
+	switch typeName {
+	// 整型及别名（包括有符号、无符号、指针类型）
+	case "int", "int8", "int16", "int32", "int64",
+		"uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
+		return "0"
+	// 浮点型
+	case "float32", "float64":
+		return "0.0"
+	// 字符串
+	case "string":
+		return "\"\""
+	// 布尔值
+	case "bool":
+		return "false"
+	// 复数类型
+	case "complex64", "complex128":
+		return fmt.Sprintf("%v", complex(0, 0))
+	// 引用类型及指针
+	case "slice", "map", "chan", "func", "pointer", "interface":
+		return "nil"
+	// 空结构体默认值
+	case "struct":
+		return "struct{}{}"
+	default:
+		return "nil" // 未知类型返回nil
+	}
 }

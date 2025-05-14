@@ -66,7 +66,7 @@ func genLogicByRouteTest(dir, rootPkg string, cfg *config.Config, group spec.Gro
 	structType, ok := route.RequestType.(spec.DefineStruct)
 	if ok {
 		for _, member := range structType.Members {
-			str := fmt.Sprintf("%s: %v,", member.Name, GetTypeDefaultValue(member.Type.Name()))
+			str := fmt.Sprintf("%s: %v,", upperCamelCase(member.Name), GetTypeDefaultValue(member))
 			reqFeilds = append(reqFeilds, str)
 		}
 	}
@@ -124,11 +124,17 @@ func getLogicFolderPathTest(group spec.Group, route spec.Route) string {
 	return path.Join(logicDirTest, folder)
 }
 
-func GetTypeDefaultValue(typeName string) string {
-	switch typeName {
+func GetTypeDefaultValue(member spec.Member) string {
+	switch member.Type.Name() {
 	// 整型及别名（包括有符号、无符号、指针类型）
 	case "int", "int8", "int16", "int32", "int64",
 		"uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
+		if strings.Contains(strings.ToLower(member.Name), "size") {
+			return "10"
+		}
+		if strings.Contains(strings.ToLower(member.Name), "page") {
+			return "1"
+		}
 		return "0"
 	// 浮点型
 	case "float32", "float64":
@@ -149,6 +155,20 @@ func GetTypeDefaultValue(typeName string) string {
 	case "struct":
 		return "struct{}{}"
 	default:
+		if strings.HasPrefix(member.Type.Name(), "[]") {
+			return fmt.Sprintf("%s{}", member.Type.Name())
+		}
+		if strings.HasPrefix(member.Type.Name(), "*") {
+			return fmt.Sprintf("%s{}", strings.Replace(member.Type.Name(), "*", "&", 1))
+		}
 		return "nil" // 未知类型返回nil
 	}
+}
+
+// 大驼峰命名法 首字母大写(暂时)
+func upperCamelCase(word string) string {
+	if len(word) == 0 {
+		return ""
+	}
+	return strings.ToUpper(string(word[0])) + word[1:]
 }

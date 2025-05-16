@@ -66,6 +66,9 @@ func genLogicByRouteTest(dir, rootPkg string, cfg *config.Config, group spec.Gro
 	structType, ok := route.RequestType.(spec.DefineStruct)
 	if ok {
 		for _, member := range structType.Members {
+			if len(member.Name) == 0 {
+				continue
+			}
 			str := fmt.Sprintf("%s: %v,", upperCamelCase(member.Name), GetTypeDefaultValue(member))
 			reqFeilds = append(reqFeilds, str)
 		}

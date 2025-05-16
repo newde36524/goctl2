@@ -32,6 +32,7 @@ type (
 		ColumnDefault   any    `db:"COLUMN_DEFAULT"`
 		IsNullAble      string `db:"IS_NULLABLE"`
 		OrdinalPosition int    `db:"ORDINAL_POSITION"`
+		TableComment    string `db:"TABLE_COMMENT"`
 	}
 
 	// DbIndex defines index of columns in information_schema.statistic
@@ -54,9 +55,10 @@ type (
 		Table   string
 		Columns []*Column
 		// Primary key not included
-		UniqueIndex map[string][]*Column
-		PrimaryKey  *Column
-		NormalIndex map[string][]*Column
+		UniqueIndex  map[string][]*Column
+		PrimaryKey   *Column
+		NormalIndex  map[string][]*Column
+		TableComment string
 	}
 
 	// IndexType describes an alias of string
@@ -130,6 +132,50 @@ func (m *InformationSchemaModel) FindColumns(db, table string) (*ColumnData, err
 	return &columnData, nil
 }
 
+// FindColumns return columns in specified database and table
+func (m *InformationSchemaModel) FindColumns2(db, table string) (*ColumnData, error) {
+	querySql := `SELECT t.TABLE_COMMENT, c.COLUMN_NAME, c.DATA_TYPE, c.COLUMN_TYPE, c.EXTRA, c.COLUMN_COMMENT, c.COLUMN_DEFAULT, c.IS_NULLABLE, c.ORDINAL_POSITION FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.TABLES t ON c.TABLE_SCHEMA = t.TABLE_SCHEMA AND c.TABLE_NAME = t.TABLE_NAME WHERE c.TABLE_SCHEMA = ? AND c.TABLE_NAME = ?;`
+	var reply []*DbColumn
+	err := m.conn.QueryRowsPartial(&reply, querySql, db, table)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []*Column
+	for _, item := range reply {
+		index, err := m.FindIndex(db, table, item.Name)
+		if err != nil {
+			if err != sqlx.ErrNotFound {
+				return nil, err
+			}
+			continue
+		}
+
+		if len(index) > 0 {
+			for _, i := range index {
+				list = append(list, &Column{
+					DbColumn: item,
+					Index:    i,
+				})
+			}
+		} else {
+			list = append(list, &Column{
+				DbColumn: item,
+			})
+		}
+	}
+
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].OrdinalPosition < list[j].OrdinalPosition
+	})
+
+	var columnData ColumnData
+	columnData.Db = db
+	columnData.Table = table
+	columnData.Columns = list
+	return &columnData, nil
+}
+
 // FindIndex finds index with given db, table and column.
 func (m *InformationSchemaModel) FindIndex(db, table, column string) ([]*DbIndex, error) {
 	querySql := `SELECT s.INDEX_NAME,s.NON_UNIQUE,s.SEQ_IN_INDEX from  STATISTICS s  WHERE  s.TABLE_SCHEMA = ? and s.TABLE_NAME = ? and s.COLUMN_NAME = ?`
@@ -150,7 +196,9 @@ func (c *ColumnData) Convert() (*Table, error) {
 	table.Columns = c.Columns
 	table.UniqueIndex = map[string][]*Column{}
 	table.NormalIndex = map[string][]*Column{}
-
+	if len(c.Columns) > 0 {
+		table.TableComment = c.Columns[0].TableComment
+	}
 	m := make(map[string][]*Column)
 	for _, each := range c.Columns {
 		each.Comment = util.TrimNewLine(each.Comment)

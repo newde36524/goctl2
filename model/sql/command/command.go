@@ -301,7 +301,7 @@ func fromMysqlDataSource(arg dataSourceArg) error {
 			continue
 		}
 
-		columnData, err := im.FindColumns(dsn.DBName, item)
+		columnData, err := im.FindColumns2(dsn.DBName, item)
 		if err != nil {
 			return err
 		}

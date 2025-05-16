@@ -26,6 +26,7 @@ type (
 		UniqueIndex map[string][]*Field
 		Fields      []*Field
 		ContainsPQ  bool
+		Comment     string
 	}
 
 	// Primary describes a primary key
@@ -279,6 +280,7 @@ func ConvertDataType(table *model.Table, strict bool) (*Table, error) {
 	reply.UniqueIndex = map[string][]*Field{}
 	reply.Name = stringx.From(table.Table)
 	reply.Db = stringx.From(table.Db)
+	reply.Comment = table.TableComment
 	seqInIndex := 0
 	if table.PrimaryKey.Index != nil {
 		seqInIndex = table.PrimaryKey.Index.SeqInIndex

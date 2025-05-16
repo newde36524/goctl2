@@ -66,6 +66,9 @@ func genLogicByRouteTest(dir, rootPkg string, cfg *config.Config, group spec.Gro
 	structType, ok := route.RequestType.(spec.DefineStruct)
 	if ok {
 		for _, member := range structType.Members {
+			if len(member.Name) == 0 {
+				continue
+			}
 			str := fmt.Sprintf("%s: %v,", upperCamelCase(member.Name), GetTypeDefaultValue(member))
 			reqFeilds = append(reqFeilds, str)
 		}
@@ -161,7 +164,7 @@ func GetTypeDefaultValue(member spec.Member) string {
 		if strings.HasPrefix(member.Type.Name(), "*") {
 			return fmt.Sprintf("%s{}", strings.Replace(member.Type.Name(), "*", "&", 1))
 		}
-		return "nil" // 未知类型返回nil
+		return fmt.Sprintf("types.%s{}", member.Type.Name())
 	}
 }
 

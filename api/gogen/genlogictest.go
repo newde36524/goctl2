@@ -128,7 +128,7 @@ func getLogicFolderPathTest(group spec.Group, route spec.Route) string {
 }
 
 func GetTypeDefaultValue(member spec.Member) string {
-	switch member.Type.Name() {
+	switch name := member.Type.Name(); name {
 	// 整型及别名（包括有符号、无符号、指针类型）
 	case "int", "int8", "int16", "int32", "int64",
 		"uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
@@ -158,13 +158,42 @@ func GetTypeDefaultValue(member spec.Member) string {
 	case "struct":
 		return "struct{}{}"
 	default:
-		if strings.HasPrefix(member.Type.Name(), "[]") {
-			return fmt.Sprintf("%s{}", member.Type.Name())
+		if strings.HasPrefix(name, "*") {
+			return fmt.Sprintf("%s{}", strings.Replace(name, "*", "&types.", 1))
 		}
-		if strings.HasPrefix(member.Type.Name(), "*") {
-			return fmt.Sprintf("%s{}", strings.Replace(member.Type.Name(), "*", "&", 1))
+		if strings.HasPrefix(name, "[]") {
+			if strings.Contains(name, "*") {
+				return fmt.Sprintf("%s{}", strings.Replace(name, "*", "*types.", 1))
+			} else {
+				switch name {
+				// 整型及别名（包括有符号、无符号、指针类型）
+				case "int", "int8", "int16", "int32", "int64",
+					"uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
+					fallthrough
+				// 浮点型
+				case "float32", "float64":
+					fallthrough
+				// 字符串
+				case "string":
+					fallthrough
+				// 布尔值
+				case "bool":
+					fallthrough
+				// 复数类型
+				case "complex64", "complex128":
+					fallthrough
+				// 引用类型及指针
+				case "slice", "map", "chan", "func", "pointer", "interface":
+					fallthrough
+				// 空结构体默认值
+				case "struct":
+					return fmt.Sprintf("%s{}", name)
+				default:
+					return fmt.Sprintf("[]types.%s{}", strings.TrimPrefix(name, "[]"))
+				}
+			}
 		}
-		return fmt.Sprintf("types.%s{}", member.Type.Name())
+		return fmt.Sprintf("types.%s{}", name)
 	}
 }
 

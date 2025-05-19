@@ -4,19 +4,19 @@
 # compare goctl between latest and newest version if exists different.
 
 execute_command() {
-    local command="$1"
+  local command="$1"
 
-    echo "=> $command"
-    eval "$command"
+  echo "=> $command"
+  eval "$command"
 }
 
-has_diff (){
+has_diff() {
   local command="$1"
-  if $command &> /dev/null; then
-          return 0
-      else
-          return 1
-      fi
+  if $command &>/dev/null; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 echo "=======================env init============================="
@@ -31,7 +31,6 @@ if [ -d $WD ]; then
 fi
 
 execute_command "mkdir -p $BIN $PROJECT_DIR $OLD_CODE $NEW_CODE"
-execute_command 'export GOPROXY="https://goproxy.cn,direct"'
 execute_command "export GOBIN=$BIN"
 
 echo "=======================install goctl============================="

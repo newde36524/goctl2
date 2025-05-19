@@ -83,9 +83,9 @@ func genLogicByRouteTest(dir, rootPkg string, cfg *config.Config, group spec.Gro
 		dir:             dir,
 		subdir:          subDir,
 		filename:        goFile + "_test.go",
-		templateName:    "logicTemplate",
+		templateName:    "logicTestTemplate",
 		category:        category,
-		templateFile:    logicTemplateTestFile,
+		templateFile:    logicTestTemplate,
 		builtinTemplate: logicTestTemplate,
 		data: map[string]any{
 			"pkgName":        subDir[strings.LastIndex(subDir, "/")+1:],
@@ -165,7 +165,7 @@ func GetTypeDefaultValue(member spec.Member) string {
 			if strings.Contains(name, "*") {
 				return fmt.Sprintf("%s{}", strings.Replace(name, "*", "*types.", 1))
 			} else {
-				switch name {
+				switch strings.TrimPrefix(name, "[]") {
 				// 整型及别名（包括有符号、无符号、指针类型）
 				case "int", "int8", "int16", "int32", "int64",
 					"uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":

@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/newde36524/goctl2/internal/version"
 	"github.com/newde36524/goctl2/util"
 )
 
@@ -45,22 +44,20 @@ var ModelCustom string
 
 // ModelGen defines a template for model
 var ModelGen = fmt.Sprintf(`%s
-// versions:
-//  goctl version: %s
 
 package {{.pkg}}
 {{.imports}}
 {{.vars}}
 {{.types}}
 {{.new}}
-{{.delete}}
-{{.find}}
 {{.insert}}
+{{.find}}
 {{.update}}
+{{.delete}}
 {{.extraMethod}}
 {{.tableName}}
 {{.customized}}
-`, util.DoNotEditHead, version.BuildVersion)
+`, util.DoNotEditHead)
 
 // Insert defines a template for insert code in model
 //

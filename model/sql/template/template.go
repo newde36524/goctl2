@@ -42,6 +42,16 @@ var New string
 //go:embed tpl/model.tpl
 var ModelCustom string
 
+// ModelCustom defines a template for extension
+//
+//go:embed tpl/model-test.tpl
+var ModelTest string
+
+// ModelCustom defines a template for extension
+//
+//go:embed tpl/model-test-common.tpl
+var ModelTestCommon string
+
 // ModelGen defines a template for model
 var ModelGen = fmt.Sprintf(`%s
 

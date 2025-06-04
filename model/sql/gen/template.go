@@ -24,6 +24,8 @@ const (
 	insertTemplateMethodFile              = "interface-insert.tpl"
 	modelGenTemplateFile                  = "model-gen.tpl"
 	modelCustomTemplateFile               = "model.tpl"
+	modelTestTemplateFile                 = "model-test.tpl"
+	modelTestCommonTemplateFile           = "model-test-common.tpl"
 	modelNewTemplateFile                  = "model-new.tpl"
 	tableNameTemplateFile                 = "table-name.tpl"
 	tagTemplateFile                       = "tag.tpl"
@@ -50,6 +52,8 @@ var templates = map[string]string{
 	insertTemplateMethodFile:              template.InsertMethod,
 	modelGenTemplateFile:                  template.ModelGen,
 	modelCustomTemplateFile:               template.ModelCustom,
+	modelTestTemplateFile:                 template.ModelTest,
+	modelTestCommonTemplateFile:           template.ModelTestCommon,
 	modelNewTemplateFile:                  template.New,
 	tableNameTemplateFile:                 template.TableName,
 	tagTemplateFile:                       template.Tag,

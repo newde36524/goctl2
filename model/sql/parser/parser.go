@@ -266,6 +266,16 @@ func (t *Table) ContainsTime() bool {
 	return false
 }
 
+// ContainsSql returns true if contains golang type sql.xxx
+func (t *Table) ContainsSql() bool {
+	for _, item := range t.Fields {
+		if strings.Contains(item.DataType, "sql.") {
+			return true
+		}
+	}
+	return false
+}
+
 // ConvertDataType converts mysql data type into golang data type
 func ConvertDataType(table *model.Table, strict bool) (*Table, error) {
 	isPrimaryDefaultNull := table.PrimaryKey.ColumnDefault == nil && table.PrimaryKey.IsNullAble == "YES"

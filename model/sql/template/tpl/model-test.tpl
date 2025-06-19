@@ -13,28 +13,28 @@ import (
 
 var {{.lowerStartCamelObject}}Model = model.New{{.upperStartCamelObject}}Model(conn)
 
-func Test{{.upperStartCamelObject}}Insert(t *testing.T) {
+func Test_{{.upperStartCamelObject}}_Insert(t *testing.T) {
 	_, err := {{.lowerStartCamelObject}}Model.Insert(context.TODO(), nil, &model.{{.upperStartCamelObject}}{{.feilds}})
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func Test{{.upperStartCamelObject}}Delete(t *testing.T) {
+func Test_{{.upperStartCamelObject}}_Delete(t *testing.T) {
 	err := {{.lowerStartCamelObject}}Model.Delete(context.TODO(), nil, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func Test{{.upperStartCamelObject}}Update(t *testing.T) {
+func Test_{{.upperStartCamelObject}}_Update(t *testing.T) {
 	_, err := {{.lowerStartCamelObject}}Model.Update(context.TODO(), nil, &model.{{.upperStartCamelObject}}{{.feilds}})
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func Test{{.upperStartCamelObject}}Select(t *testing.T) {
+func Test_{{.upperStartCamelObject}}_Select(t *testing.T) {
 	v, err := {{.lowerStartCamelObject}}Model.FindOne(context.TODO(), 1)
 	if err != nil {
 		t.Fatal(err)

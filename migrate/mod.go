@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"time"
 
 	"github.com/newde36524/goctl2/rpc/execx"
 	"github.com/newde36524/goctl2/util/console"
 	"github.com/newde36524/goctl2/util/ctx"
-	"github.com/zeromicro/go-zero/core/stringx"
 )
 
 const (
@@ -37,7 +37,7 @@ func editMod(version string, verbose bool) error {
 		return err
 	}
 
-	if !stringx.Contains(latest, version) {
+	if !slices.Contains(latest, version) {
 		return fmt.Errorf("release version %q is not found", version)
 	}
 

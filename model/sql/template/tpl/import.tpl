@@ -1,14 +1,14 @@
 import (
+	"app-server/common/globalkey"
 	"context"
 	"database/sql"
 	"fmt"
 	"strings"
 	{{if .time}}"time"{{end}}
-
-	"app-server/common/globalkey"
 	
 	"github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
+	{{if .containsPQ}}"github.com/lib/pq"{{end}}
 	"github.com/zeromicro/go-zero/core/stores/builder"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"

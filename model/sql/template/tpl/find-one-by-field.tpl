@@ -29,4 +29,3 @@ func (m *default{{.upperStartCamelObject}}Model) FindOneBy{{.upperField}}(ctx co
 		return nil, err
 	}
 }{{end}}
-

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	proto2 "github.com/emicklei/proto"
 	conf "github.com/newde36524/goctl2/config"
 	"github.com/newde36524/goctl2/rpc/parser"
 	"github.com/newde36524/goctl2/util"
@@ -39,7 +40,7 @@ func (g *Generator) genLogicInCompatibility2(ctx DirContext, proto parser.Proto,
 			return err
 		}
 
-		filename := filepath.Join(dir.Filename, logicFilename+".go")
+		filename := filepath.Join(dir.Filename, logicFilename+"_test.go")
 		functions, err := g.genLogicFunction2(service, proto.PbPackage, logicName, rpc)
 		if err != nil {
 			return err
@@ -92,7 +93,7 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 				return err
 			}
 
-			filename = filepath.Join(dir.Filename, serviceDir, logicFilename+".go")
+			filename = filepath.Join(dir.Filename, serviceDir, logicFilename+"_test.go")
 			functions, err := g.genLogicFunction2(serviceName, proto.PbPackage, logicName, rpc)
 			if err != nil {
 				return err
@@ -105,6 +106,35 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 			if err != nil {
 				return err
 			}
+
+			var reqFeilds []string
+			for _, v := range proto.Message {
+				if v.Name == rpc.RequestType {
+					for _, v2 := range v.Elements {
+						f, ok := v2.(*proto2.NormalField)
+						if ok {
+							fmt.Println(f.Field.Name, f.Field.Type, f.Field.Comment)
+							str := fmt.Sprintf("%s: %v,", upperCamelCase(f.Field.Name), GetTypeDefaultValue(f.Field.Name, f.Field.Type))
+							reqFeilds = append(reqFeilds, str)
+						}
+					}
+				}
+			}
+			// structType, ok := route.RequestType.(spec.DefineStruct)
+			// if ok {
+			// 	for _, member := range structType.Members {
+			// 		if len(member.Name) == 0 {
+			// 			continue
+			// 		}
+			// 		str := fmt.Sprintf("%s: %v,", upperCamelCase(member.Name), GetTypeDefaultValue(member))
+			// 		reqFeilds = append(reqFeilds, str)
+			// 	}
+			// }
+			reqFeildsStr := strings.Join(reqFeilds, "\n")
+			if len(reqFeilds) > 0 {
+				reqFeildsStr = "\n" + reqFeildsStr + "\n"
+			}
+			reqFeildsStr = "{" + reqFeildsStr + "}"
 
 			if err = util.With("logic").GoFmt(true).Parse(text).SaveTo(map[string]any{
 				"ProjectName":  proto.PbPackage,
@@ -121,6 +151,7 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 				"response":     fmt.Sprintf("*%s.%s", proto.PbPackage, parser.CamelCase(rpc.ReturnsType)),
 				"responseType": fmt.Sprintf("%s.%s", proto.PbPackage, parser.CamelCase(rpc.ReturnsType)),
 				"internal":     ctx.GetInternal().Package,
+				"reqFeilds":    reqFeildsStr,
 			}, filename, false); err != nil {
 				return err
 			}
@@ -160,4 +191,71 @@ func (g *Generator) genLogicFunction2(serviceName, goPackage, logicName string,
 
 	functions = append(functions, buffer.String())
 	return strings.Join(functions, pathx.NL), nil
+}
+
+func GetTypeDefaultValue(feildName, feildType string) string {
+	switch feildType {
+	// 整型及别名（包括有符号、无符号、指针类型）
+	case "int", "int8", "int16", "int32", "int64",
+		"uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
+		if strings.Contains(strings.ToLower(feildName), "size") {
+			return "10"
+		}
+		if strings.Contains(strings.ToLower(feildName), "page") {
+			return "1"
+		}
+		return "1"
+	// 浮点型
+	case "float", "float32", "float64":
+		return "1.0"
+	// 字符串
+	case "string":
+		return "\"\""
+	// 布尔值
+	case "bool":
+		return "false"
+	// 复数类型
+	case "complex64", "complex128":
+		return fmt.Sprintf("%v", complex(0, 0))
+	// 空结构体默认值
+	default:
+		if strings.HasPrefix(feildType, "*") {
+			return fmt.Sprintf("%s{}", strings.Replace(feildType, "*", "&types.", 1))
+		}
+		if strings.HasPrefix(feildType, "[]") {
+			if strings.Contains(feildType, "*") {
+				return fmt.Sprintf("%s{}", strings.Replace(feildType, "*", "*types.", 1))
+			} else {
+				switch strings.TrimPrefix(feildType, "[]") {
+				// 整型及别名（包括有符号、无符号、指针类型）
+				case "int", "int8", "int16", "int32", "int64",
+					"uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
+					fallthrough
+				// 浮点型
+				case "float32", "float64":
+					fallthrough
+				// 字符串
+				case "string":
+					fallthrough
+				// 布尔值
+				case "bool":
+					fallthrough
+				// 复数类型
+				case "complex64", "complex128":
+					return fmt.Sprintf("%s{}", feildType)
+				default:
+					return fmt.Sprintf("[]types.%s{}", strings.TrimPrefix(feildType, "[]"))
+				}
+			}
+		}
+		return fmt.Sprintf("types.%s{}", feildType)
+	}
+}
+
+// 大驼峰命名法 首字母大写(暂时)
+func upperCamelCase(word string) string {
+	if len(word) == 0 {
+		return ""
+	}
+	return strings.ToUpper(string(word[0])) + word[1:]
 }

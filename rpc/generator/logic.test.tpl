@@ -46,7 +46,7 @@ func Test_{{.method}}(t *testing.T) {
 	ctx, svcCtx := context.WithValue(context.Background(), "userId", int64(1101001)), svc.NewServiceContext(c)
 
 	l := {{.serviceName}}logic.New{{.logicName}}(ctx, svcCtx)
-	{{if .hasReply}}resp ,{{end}}err := l.{{.method}}({{if .hasReq}}&{{.request}}{}{{end}})
+	{{if .hasReply}}resp ,{{end}}err := l.{{.method}}({{if .hasReq}}&{{.request}}{{.reqFeilds}}{{end}})
 	{{if .hasReply}}fmt.Println(toJson(resp))
 	if err != nil {
 		fmt.Println(err)

@@ -138,10 +138,10 @@ func GetTypeDefaultValue(member spec.Member) string {
 		if strings.Contains(strings.ToLower(member.Name), "page") {
 			return "1"
 		}
-		return "0"
+		return "1"
 	// 浮点型
 	case "float32", "float64":
-		return "0.0"
+		return "1.0"
 	// 字符串
 	case "string":
 		return "\"\""

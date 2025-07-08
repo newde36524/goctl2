@@ -113,23 +113,12 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 					for _, v2 := range v.Elements {
 						f, ok := v2.(*proto2.NormalField)
 						if ok {
-							fmt.Println(f.Field.Name, f.Field.Type, f.Field.Comment)
 							str := fmt.Sprintf("%s: %v,", upperCamelCase(f.Field.Name), GetTypeDefaultValue(f.Field.Name, f.Field.Type))
 							reqFeilds = append(reqFeilds, str)
 						}
 					}
 				}
 			}
-			// structType, ok := route.RequestType.(spec.DefineStruct)
-			// if ok {
-			// 	for _, member := range structType.Members {
-			// 		if len(member.Name) == 0 {
-			// 			continue
-			// 		}
-			// 		str := fmt.Sprintf("%s: %v,", upperCamelCase(member.Name), GetTypeDefaultValue(member))
-			// 		reqFeilds = append(reqFeilds, str)
-			// 	}
-			// }
 			reqFeildsStr := strings.Join(reqFeilds, "\n")
 			if len(reqFeilds) > 0 {
 				reqFeildsStr = "\n" + reqFeildsStr + "\n"

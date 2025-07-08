@@ -246,5 +246,9 @@ func upperCamelCase(word string) string {
 	if len(word) == 0 {
 		return ""
 	}
-	return strings.ToUpper(string(word[0])) + word[1:]
+	var sb strings.Builder
+	for _, word := range strings.Split(word, "_") {
+		sb.WriteString(strings.ToUpper(string(word[0])) + word[1:])
+	}
+	return sb.String()
 }

@@ -47,6 +47,10 @@ func Test_{{.method}}(t *testing.T) {
 
 	l := {{.serviceName}}logic.New{{.logicName}}(ctx, svcCtx)
 	{{if .hasReply}}resp ,{{end}}err := l.{{.method}}({{if .hasReq}}&{{.request}}{{.reqFeilds}}{{end}})
+	if err != nil {
+		fmt.Println(err)
+		t.Failed()
+	}
 	{{if .hasReply}}fmt.Println(toJson(resp))
 	if err != nil {
 		fmt.Println(err)

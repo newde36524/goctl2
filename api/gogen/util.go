@@ -57,6 +57,19 @@ func genFile(c fileGenConfig) error {
 	return err
 }
 
+func genApiTestFile(dir, subdir, filename, text string) error {
+	fp, created, err := util.MaybeCreateFile(dir, subdir, filename)
+	if err != nil {
+		return err
+	}
+	if !created {
+		return nil
+	}
+	defer fp.Close()
+	_, err = fp.WriteString(text)
+	return nil
+}
+
 func writeProperty(writer io.Writer, name, tag, comment string, tp spec.Type, indent int) error {
 	util.WriteIndent(writer, indent)
 	var (

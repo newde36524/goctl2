@@ -193,3 +193,11 @@ func upperCamelCase(word string) string {
 	}
 	return strings.ToUpper(string(word[0])) + word[1:]
 }
+
+// 大驼峰命名法 首字母小写(暂时)
+func lowerCamelCase(word string) string {
+	if len(word) == 0 {
+		return ""
+	}
+	return strings.ToLower(string(word[0])) + word[1:]
+}

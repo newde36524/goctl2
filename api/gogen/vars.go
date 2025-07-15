@@ -8,6 +8,7 @@ const (
 	handlerDir    = internal + "handler"
 	logicDir      = internal + "logic"
 	logicDirTest  = internal + "logic.test"
+	apiDirTest    = internal + "api.test"
 	middlewareDir = internal + "middleware"
 	typesDir      = internal + typesPacket
 	groupProperty = "group"

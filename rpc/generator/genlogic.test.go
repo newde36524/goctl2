@@ -113,6 +113,9 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 					for _, v2 := range v.Elements {
 						f, ok := v2.(*proto2.NormalField)
 						if ok {
+							if f.Repeated {
+								f.Field.Type = fmt.Sprintf("[]%s", f.Field.Type)
+							}
 							str := fmt.Sprintf("%s: %v,", upperCamelCase(f.Field.Name), GetTypeDefaultValue(f.Field.Name, f.Field.Type))
 							reqFeilds = append(reqFeilds, str)
 						}

@@ -116,7 +116,7 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 							if f.Repeated {
 								f.Field.Type = fmt.Sprintf("[]%s", f.Field.Type)
 							}
-							str := fmt.Sprintf("%s: %v,", upperCamelCase(f.Field.Name), GetTypeDefaultValue(f.Field.Name, f.Field.Type))
+							str := fmt.Sprintf("%s: %v,", upperCamelCase(f.Field.Name), GetTypeDefaultValue(proto.PbPackage, f.Field.Name, f.Field.Type))
 							reqFeilds = append(reqFeilds, str)
 						}
 					}
@@ -185,7 +185,7 @@ func (g *Generator) genLogicFunction2(serviceName, goPackage, logicName string,
 	return strings.Join(functions, pathx.NL), nil
 }
 
-func GetTypeDefaultValue(feildName, feildType string) string {
+func GetTypeDefaultValue(pbPackage, feildName, feildType string) string {
 	switch feildType {
 	// 整型及别名（包括有符号、无符号、指针类型）
 	case "int", "int8", "int16", "int32", "int64",
@@ -236,11 +236,11 @@ func GetTypeDefaultValue(feildName, feildType string) string {
 				case "complex64", "complex128":
 					return fmt.Sprintf("%s{}", feildType)
 				default:
-					return fmt.Sprintf("[]types.%s{}", strings.TrimPrefix(feildType, "[]"))
+					return fmt.Sprintf("[]*%s.%s{}", pbPackage, strings.TrimPrefix(feildType, "[]"))
 				}
 			}
 		}
-		return fmt.Sprintf("types.%s{}", feildType)
+		return fmt.Sprintf("%s.%s{}", pbPackage, feildType)
 	}
 }
 

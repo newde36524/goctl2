@@ -1,6 +1,8 @@
 package api
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/newde36524/goctl2/api/apigen"
 	"github.com/newde36524/goctl2/api/dartgen"
 	"github.com/newde36524/goctl2/api/docgen"
@@ -15,7 +17,6 @@ import (
 	"github.com/newde36524/goctl2/config"
 	"github.com/newde36524/goctl2/internal/cobrax"
 	"github.com/newde36524/goctl2/plugin"
-	"github.com/spf13/cobra"
 )
 
 var (

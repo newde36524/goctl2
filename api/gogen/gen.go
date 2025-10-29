@@ -84,6 +84,10 @@ func DoGenProject(apiFile, dir, style string, withTest bool) error {
 		return err
 	}
 
+	if err := api.CheckTag(); err != nil {
+		return err
+	}
+
 	cfg, err := config.NewConfig(style)
 	if err != nil {
 		return err

@@ -1,0 +1,35 @@
+syntax = "v1"
+
+info (
+	title:   "XXXX"
+	version: "v1"
+)
+
+type (
+	XXXXStoreReq {
+		Id int64 `form:"Id"`
+	}
+	XXXXStoreResp  {}
+)
+
+type (
+	XXXXUserStoreReq {
+		Id int64 `json:"Id"`
+	}
+	XXXXUserStoreResp  {}
+)
+
+@server (
+	tags:   "xxxx"
+	group:  xxxx
+	prefix: /api/v1
+	jwt:    Auth
+)
+service client-api {
+	@handler XXXXStore
+	get /group/store (XXXXStoreReq) returns (XXXXStoreResp)
+
+	@handler XXXXUserStore
+	post /user/store (XXXXUserStoreReq) returns (XXXXUserStoreResp)
+}
+

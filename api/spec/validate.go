@@ -44,10 +44,10 @@ func (s *ApiSpec) CheckTag() {
 						for _, member := range v.Members {
 							if !strings.Contains(member.Tag, tag) {
 								if method == "get" {
-									gets = append(gets, color.Red.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [typeName:%s] [group:%s] [prefix:%s] [tags:%s]", method, tag, route.Path, member.Tag, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
+									gets = append(gets, color.Red.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", method, tag, route.Path, member.Tag, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
 								}
 								if method == "post" { //暂时不打印
-									posts = append(posts, color.Yellow.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [typeName:%s] [group:%s] [prefix:%s] [tags:%s]", method, tag, route.Path, member.Tag, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
+									posts = append(posts, color.Yellow.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", method, tag, route.Path, member.Tag, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
 								}
 							}
 						}

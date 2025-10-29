@@ -18,7 +18,7 @@ func MaybeCreateFile(dir, subdir, file string) (fp *os.File, created bool, err e
 	logx.Must(pathx.MkdirIfNotExist(path.Join(dir, subdir)))
 	fpath := path.Join(dir, subdir, file)
 	if pathx.FileExists(fpath) {
-		fmt.Printf("%s exists, ignored generation\n", fpath)
+		// fmt.Printf("%s exists, ignored generation\n", fpath)
 		return nil, false, nil
 	}
 

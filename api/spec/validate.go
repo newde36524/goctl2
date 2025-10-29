@@ -1,8 +1,12 @@
 package spec
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/gookit/color"
@@ -46,7 +50,7 @@ func (s *ApiSpec) CheckTag() {
 								if method == "get" {
 									gets = append(gets, color.Red.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", method, tag, route.Path, member.Tag, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
 								}
-								if method == "post" { //暂时不打印
+								if method == "post" {
 									posts = append(posts, color.Yellow.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", method, tag, route.Path, member.Tag, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
 								}
 							}
@@ -56,7 +60,38 @@ func (s *ApiSpec) CheckTag() {
 			}
 		}
 	}
-	for _, v := range append(posts, gets...) {
+	s.onceCheck(posts, func(s string) {
+		fmt.Println(s)
+	})
+	// for _, v := range posts {
+	// 	fmt.Println(v)
+	// }
+	for _, v := range gets {
 		fmt.Println(v)
+	}
+}
+
+// onceCheck 特殊处理 旧的接口只提示一次，往后新增的接口再提示
+func (s *ApiSpec) onceCheck(ignoreList []string, fn func(s string)) {
+	fileName := "ignoreTagList"
+	ex, _ := os.Executable()
+	fullName := filepath.Join(filepath.Dir(ex), fileName)
+	if _, err := os.Stat(fullName); os.IsNotExist(err) {
+		fs, _ := os.Create(fullName)
+		bs, _ := json.Marshal(ignoreList)
+		fs.WriteString(string(bs))
+		fs.Close()
+		for _, v := range ignoreList {
+			fn(v)
+		}
+		return
+	}
+	bs, _ := os.ReadFile(fullName)
+	var ignoreList2 []string
+	json.Unmarshal(bs, &ignoreList2)
+	for _, v := range ignoreList {
+		if !slices.Contains(ignoreList2, v) {
+			fn(v)
+		}
 	}
 }

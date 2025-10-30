@@ -17,6 +17,7 @@ import (
 	"github.com/zeromicro/go-zero/core/stringx"
 )
 
+//nolint:unused
 var conn = sqlx.NewMysql("root:123456@tcp(127.0.0.1:3306)/dev?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai")
 
 func isNoColumns[T any](b squirrel.SelectBuilder) bool {

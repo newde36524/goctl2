@@ -25,12 +25,23 @@ func (s *ApiSpec) Validate() error {
 	return nil
 }
 
+func (s *ApiSpec) tagClear(tag string) string {
+	vTag := strings.Trim(tag, "`")
+	vTag = strings.Trim(vTag, `"`)
+	vTag = strings.TrimPrefix(vTag, "form:")
+	vTag = strings.TrimPrefix(vTag, "json:")
+	vTag = strings.ReplaceAll(vTag, "\"", "")
+	vTag = strings.ReplaceAll(vTag, `"`, "")
+	return vTag
+}
+
 // CheckTag 检查tag是否合法
 func (s *ApiSpec) CheckTag() {
 	var (
-		gets  []string
-		posts []string
-		mp    = map[string]string{
+		gets      []string
+		posts     []string
+		tagFatail []string
+		mp        = map[string]string{
 			"get":  "form",
 			"post": "json",
 		}
@@ -46,12 +57,26 @@ func (s *ApiSpec) CheckTag() {
 					if _type.Name() == route.RequestType.Name() {
 						v := _type.(DefineStruct)
 						for _, member := range v.Members {
+							memberName := member.Name
+							if len(memberName) == 0 { //直接组合的类型不用判断tag
+								continue
+							}
+							vTag := s.tagClear(member.Tag)
+							if len(vTag) == 0 {
+								tagFatail = append(tagFatail, color.Red.Render(fmt.Errorf("tag is not set. [member: %s] [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", memberName, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
+								continue
+							}
+							firstChar := strings.Split(vTag, "")[0]
+							if firstChar == strings.ToUpper(firstChar) { //首字母必须小写
+								tagFatail = append(tagFatail, color.Red.Render(fmt.Errorf("tag first char is Upper, now have %s. [member: %s] [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", member.Tag, memberName, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
+								continue
+							}
 							if !strings.Contains(member.Tag, tag) {
 								if method == "get" {
-									gets = append(gets, color.Red.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", method, tag, route.Path, member.Tag, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
+									gets = append(gets, color.Red.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [member: %s] [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", method, tag, route.Path, member.Tag, memberName, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
 								}
 								if method == "post" {
-									posts = append(posts, color.Yellow.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", method, tag, route.Path, member.Tag, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
+									posts = append(posts, color.Yellow.Render(fmt.Errorf("%s method must use `%s` tag for %s, now have %s. [member: %s] [typeName: %s] [group: %s] [prefix: %s] [tags: %s]", method, tag, route.Path, member.Tag, memberName, _type.Name(), group.Annotation.Properties["group"], group.Annotation.Properties["prefix"], group.Annotation.Properties["tags"]).Error()))
 								}
 							}
 						}
@@ -60,12 +85,9 @@ func (s *ApiSpec) CheckTag() {
 			}
 		}
 	}
-	s.onceCheck(posts, func(s string) {
+	s.onceCheck(append(posts, tagFatail...), func(s string) {
 		fmt.Println(s)
 	})
-	// for _, v := range posts {
-	// 	fmt.Println(v)
-	// }
 	for _, v := range gets {
 		fmt.Println(v)
 	}
@@ -89,9 +111,15 @@ func (s *ApiSpec) onceCheck(ignoreList []string, fn func(s string)) {
 	bs, _ := os.ReadFile(fullName)
 	var ignoreList2 []string
 	json.Unmarshal(bs, &ignoreList2)
+	tmp := false
 	for _, v := range ignoreList {
-		if !slices.Contains(ignoreList2, v) {
-			fn(v)
+		if slices.Contains(ignoreList2, v) {
+			tmp = true
+			continue
 		}
+		fn(v)
+	}
+	if tmp {
+		fmt.Println("已忽略旧不规范文档，如需再次检测可执行命令删除记录文件 rm -rf $(go env GOPATH)/bin/" + fileName)
 	}
 }

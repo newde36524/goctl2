@@ -85,12 +85,12 @@ func (s *ApiSpec) CheckTag() {
 			}
 		}
 	}
-	s.onceCheck(append(posts, tagFatail...), func(s string) {
+	s.onceCheck(append(append(posts, tagFatail...), gets...), func(s string) {
 		fmt.Println(s)
 	})
-	for _, v := range gets {
-		fmt.Println(v)
-	}
+	// for _, v := range gets {
+	// 	fmt.Println(v)
+	// }
 }
 
 // onceCheck 特殊处理 旧的接口只提示一次，往后新增的接口再提示

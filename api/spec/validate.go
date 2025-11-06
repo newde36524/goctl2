@@ -95,7 +95,8 @@ func (s *ApiSpec) CheckTag() {
 
 // onceCheck 特殊处理 旧的接口只提示一次，往后新增的接口再提示
 func (s *ApiSpec) onceCheck(ignoreList []string, fn func(s string)) {
-	fileName := "ignoreTagList"
+	dir, _ := os.Getwd()
+	fileName := fmt.Sprintf("ignoreTagList_%s", filepath.Base(dir))
 	ex, _ := os.Executable()
 	fullName := filepath.Join(filepath.Dir(ex), fileName)
 	if _, err := os.Stat(fullName); os.IsNotExist(err) {

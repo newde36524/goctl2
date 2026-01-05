@@ -7,6 +7,7 @@ import (
 
 	"github.com/newde36524/goctl2/api/spec"
 	"github.com/newde36524/goctl2/config"
+	"github.com/newde36524/goctl2/internal/version"
 	"github.com/newde36524/goctl2/util/format"
 	"github.com/newde36524/goctl2/util/pathx"
 	"github.com/newde36524/goctl2/vars"
@@ -15,7 +16,7 @@ import (
 //go:embed main.tpl
 var mainTemplate string
 
-func genMain(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
+func genMain(dir, rootPkg, projectPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	name := strings.ToLower(api.Service.Name)
 	filename, err := format.FileNamingFormat(cfg.NamingFormat, name)
 	if err != nil {
@@ -38,6 +39,8 @@ func genMain(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 		data: map[string]string{
 			"importPackages": genMainImports(rootPkg),
 			"serviceName":    configName,
+			"projectPkg":     projectPkg,
+			"version":        version.BuildVersion,
 		},
 	})
 }

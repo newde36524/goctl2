@@ -46,9 +46,9 @@ func (g *Generator) genLogicInCompatibility2(ctx DirContext, proto parser.Proto,
 			return err
 		}
 
-		imports := collection.NewSet()
-		imports.AddStr(fmt.Sprintf(`"%v"`, ctx.GetSvc().Package))
-		imports.AddStr(fmt.Sprintf(`"%v"`, ctx.GetPb().Package))
+		imports := collection.NewSet[string]()
+		imports.Add(fmt.Sprintf(`"%v"`, ctx.GetSvc().Package))
+		imports.Add(fmt.Sprintf(`"%v"`, ctx.GetPb().Package))
 		text, err := pathx.LoadTemplate(category, logicTemplateFileFile, logicTemplate)
 		if err != nil {
 			return err
@@ -57,7 +57,7 @@ func (g *Generator) genLogicInCompatibility2(ctx DirContext, proto parser.Proto,
 			"logicName":   fmt.Sprintf("%sLogic", stringx.From(rpc.Name).ToCamel()),
 			"functions":   functions,
 			"packageName": "logic",
-			"imports":     strings.Join(imports.KeysStr(), pathx.NL),
+			"imports":     strings.Join(imports.Keys(), pathx.NL),
 		}, filename, false)
 		if err != nil {
 			return err
@@ -99,9 +99,9 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 				return err
 			}
 
-			imports := collection.NewSet()
-			imports.AddStr(fmt.Sprintf(`"%v"`, ctx.GetSvc().Package))
-			imports.AddStr(fmt.Sprintf(`"%v"`, ctx.GetPb().Package))
+			imports := collection.NewSet[string]()
+			imports.Add(fmt.Sprintf(`"%v"`, ctx.GetSvc().Package))
+			imports.Add(fmt.Sprintf(`"%v"`, ctx.GetPb().Package))
 			text, err := pathx.LoadTemplate(category, logicTestTemplateFileFile, logicTestTemplate)
 			if err != nil {
 				return err
@@ -135,7 +135,7 @@ func (g *Generator) genLogicGroup2(ctx DirContext, proto parser.Proto, cfg *conf
 				"serviceName":  strings.ToLower(stringx.From(serviceName).ToCamel()),
 				"method":       parser.CamelCase(rpc.Name),
 				"packageName":  packageName,
-				"imports":      strings.Join(imports.KeysStr(), pathx.NL),
+				"imports":      strings.Join(imports.Keys(), pathx.NL),
 				"hasReq":       !rpc.StreamsRequest,
 				"hasReply":     !rpc.StreamsRequest && !rpc.StreamsReturns,
 				"stream":       rpc.StreamsRequest || rpc.StreamsReturns,

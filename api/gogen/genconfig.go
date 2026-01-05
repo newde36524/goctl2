@@ -7,6 +7,7 @@ import (
 
 	"github.com/newde36524/goctl2/api/spec"
 	"github.com/newde36524/goctl2/config"
+	"github.com/newde36524/goctl2/internal/version"
 	"github.com/newde36524/goctl2/util/format"
 	"github.com/newde36524/goctl2/vars"
 )
@@ -29,20 +30,20 @@ const (
 //go:embed config.tpl
 var configTemplate string
 
-func genConfig(dir string, cfg *config.Config, api *spec.ApiSpec) error {
+func genConfig(dir, projectPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	filename, err := format.FileNamingFormat(cfg.NamingFormat, configFile)
 	if err != nil {
 		return err
 	}
 
 	authNames := getAuths(api)
-	var auths []string
+	auths := make([]string, 0, len(authNames))
 	for _, item := range authNames {
 		auths = append(auths, fmt.Sprintf("%s %s", item, jwtTemplate))
 	}
 
 	jwtTransNames := getJwtTrans(api)
-	var jwtTransList []string
+	jwtTransList := make([]string, 0, len(jwtTransNames))
 	for _, item := range jwtTransNames {
 		jwtTransList = append(jwtTransList, fmt.Sprintf("%s %s", item, jwtTransTemplate))
 	}
@@ -60,6 +61,8 @@ func genConfig(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 			"authImport": authImportStr,
 			"auth":       strings.Join(auths, "\n"),
 			"jwtTrans":   strings.Join(jwtTransList, "\n"),
+			"projectPkg": projectPkg,
+			"version":    version.BuildVersion,
 		},
 	})
 }

@@ -82,7 +82,7 @@ func Parse(filename, database string, strict bool) ([]*Table, error) {
 	for indexTable, e := range tables {
 		var (
 			primaryColumn    string
-			primaryColumnSet = collection.NewSet()
+			primaryColumnSet = collection.NewSet[string]()
 			uniqueKeyMap     = make(map[string][]string)
 			// Unused local variable
 			// normalKeyMap     = make(map[string][]string)
@@ -92,7 +92,7 @@ func Parse(filename, database string, strict bool) ([]*Table, error) {
 		for _, column := range columns {
 			if column.Constraint != nil {
 				if column.Constraint.Primary {
-					primaryColumnSet.AddStr(column.Name)
+					primaryColumnSet.Add(column.Name)
 				}
 
 				if column.Constraint.Unique {
@@ -114,7 +114,7 @@ func Parse(filename, database string, strict bool) ([]*Table, error) {
 
 			if len(e.ColumnPrimaryKey) == 1 {
 				primaryColumn = e.ColumnPrimaryKey[0]
-				primaryColumnSet.AddStr(e.ColumnPrimaryKey[0])
+				primaryColumnSet.Add(e.ColumnPrimaryKey[0])
 			}
 
 			if len(e.ColumnUniqueKey) > 0 {
@@ -174,7 +174,7 @@ func Parse(filename, database string, strict bool) ([]*Table, error) {
 
 func checkDuplicateUniqueIndex(uniqueIndex map[string][]*Field, tableName string) {
 	log := console.NewColorConsole()
-	uniqueSet := collection.NewSet()
+	uniqueSet := collection.NewSet[string]()
 	for k, i := range uniqueIndex {
 		var list []string
 		for _, e := range i {
@@ -188,7 +188,7 @@ func checkDuplicateUniqueIndex(uniqueIndex map[string][]*Field, tableName string
 			continue
 		}
 
-		uniqueSet.AddStr(joinRet)
+		uniqueSet.Add(joinRet)
 	}
 }
 
@@ -323,7 +323,7 @@ func ConvertDataType(table *model.Table, strict bool) (*Table, error) {
 		return reply.Fields[i].OrdinalPosition < reply.Fields[j].OrdinalPosition
 	})
 
-	uniqueIndexSet := collection.NewSet()
+	uniqueIndexSet := collection.NewSet[string]()
 	log := console.NewColorConsole()
 	for indexName, each := range table.UniqueIndex {
 		sort.Slice(each, func(i, j int) bool {
@@ -354,7 +354,7 @@ func ConvertDataType(table *model.Table, strict bool) (*Table, error) {
 			continue
 		}
 
-		uniqueIndexSet.AddStr(uniqueKey)
+		uniqueIndexSet.Add(uniqueKey)
 		reply.UniqueIndex[indexName] = list
 	}
 

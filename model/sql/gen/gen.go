@@ -1,13 +1,10 @@
 package gen
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
-	"net/textproto"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/newde36524/goctl2/config"
@@ -56,8 +53,6 @@ type (
 	codeTuple struct {
 		modelCode       string
 		modelCustomCode string
-		modelTestCode   string
-		modelCommonCode string
 	}
 )
 
@@ -142,21 +137,9 @@ func (g *defaultGenerator) StartFromInformationSchema(tables map[string]*model.T
 			return err
 		}
 
-		modelTestCode, err := g.genModelTest(*table)
-		if err != nil {
-			return err
-		}
-
-		modelCommonCode, err := g.genModelCommonTest(*table)
-		if err != nil {
-			return err
-		}
-
 		m[table.Name.Source()] = &codeTuple{
 			modelCode:       code,
 			modelCustomCode: customCode,
-			modelTestCode:   modelTestCode,
-			modelCommonCode: modelCommonCode,
 		}
 	}
 
@@ -176,12 +159,6 @@ func (g *defaultGenerator) createFile(modelList map[string]*codeTuple) error {
 		return err
 	}
 
-	testDir := dirAbs + ".test"
-	err = pathx.MkdirIfNotExist(testDir)
-	if err != nil {
-		return err
-	}
-
 	for tableName, codes := range modelList {
 		tn := stringx.From(tableName)
 		modelFilename, err := format.FileNamingFormat(g.cfg.NamingFormat,
@@ -193,26 +170,6 @@ func (g *defaultGenerator) createFile(modelList map[string]*codeTuple) error {
 		name := util.SafeString(modelFilename) + "_gen.go"
 		filename := filepath.Join(dirAbs, name)
 		err = os.WriteFile(filename, []byte(codes.modelCode), os.ModePerm)
-		if err != nil {
-			return err
-		}
-
-		name = "common.go"
-		filename = filepath.Join(testDir, name)
-		if !pathx.FileExists(filename) {
-			err = os.WriteFile(filename, []byte(codes.modelCommonCode), os.ModePerm)
-			if err != nil {
-				return err
-			}
-		}
-
-		name = util.SafeString(modelFilename) + "_test.go"
-		filename = filepath.Join(testDir, name)
-		if pathx.FileExists(filename) {
-			g.Warning("%s already exists, ignored.", name)
-			continue
-		}
-		err = os.WriteFile(filename, []byte(codes.modelTestCode), os.ModePerm)
 		if err != nil {
 			return err
 		}
@@ -272,21 +229,9 @@ func (g *defaultGenerator) genFromDDL(filename string, withCache, strict bool, d
 			return nil, err
 		}
 
-		modelTestCode, err := g.genModelTest(*e)
-		if err != nil {
-			return nil, err
-		}
-
-		modelCommonCode, err := g.genModelCommonTest(*e)
-		if err != nil {
-			return nil, err
-		}
-
 		m[e.Name.Source()] = &codeTuple{
 			modelCode:       code,
 			modelCustomCode: customCode,
-			modelTestCode:   modelTestCode,
-			modelCommonCode: modelCommonCode,
 		}
 	}
 
@@ -429,50 +374,6 @@ func (g *defaultGenerator) genModelCustom(in parser.Table, withCache bool) (stri
 	return output.String(), nil
 }
 
-func (g *defaultGenerator) genModelTest(in parser.Table) (string, error) {
-	if len(in.PrimaryKey.Name.Source()) == 0 {
-		return "", fmt.Errorf("table %s: missing primary key", in.Name.Source())
-	}
-
-	primaryKey, uniqueKey := genCacheKeys(g.prefix, in)
-
-	var table Table
-	table.Table = in
-	table.PrimaryCacheKey = primaryKey
-	table.UniqueCacheKey = uniqueKey
-	table.ContainsUniqueCacheKey = len(uniqueKey) > 0
-	table.ignoreColumns = g.ignoreColumns
-
-	output, err := g.executeModelTest(table)
-	if err != nil {
-		return "", err
-	}
-
-	return output.String(), nil
-}
-
-func (g *defaultGenerator) genModelCommonTest(in parser.Table) (string, error) {
-	if len(in.PrimaryKey.Name.Source()) == 0 {
-		return "", fmt.Errorf("table %s: missing primary key", in.Name.Source())
-	}
-
-	primaryKey, uniqueKey := genCacheKeys(g.prefix, in)
-
-	var table Table
-	table.Table = in
-	table.PrimaryCacheKey = primaryKey
-	table.UniqueCacheKey = uniqueKey
-	table.ContainsUniqueCacheKey = len(uniqueKey) > 0
-	table.ignoreColumns = g.ignoreColumns
-
-	output, err := g.executeModelCommonTest(table)
-	if err != nil {
-		return "", err
-	}
-
-	return output.String(), nil
-}
-
 func (g *defaultGenerator) executeModel(table Table, code *code) (*bytes.Buffer, error) {
 	text, err := pathx.LoadTemplate(category, modelGenTemplateFile, template.ModelGen)
 	if err != nil {
@@ -500,116 +401,6 @@ func (g *defaultGenerator) executeModel(table Table, code *code) (*bytes.Buffer,
 		return nil, err
 	}
 	return output, nil
-}
-
-func (g *defaultGenerator) executeModelTest(table Table) (*bytes.Buffer, error) {
-	text, err := pathx.LoadTemplate(category, modelTestTemplateFile, template.ModelTest)
-	if err != nil {
-		return nil, err
-	}
-	t := util.With("model").
-		Parse(text).
-		GoFmt(true)
-	feilds := make([]string, 0)
-	for _, field := range table.Fields {
-		feilds = append(feilds, fmt.Sprintf("%s: %s,", field.Name.ToCamel(), GetTypeDefaultValue(field.DataType)))
-	}
-	feildsStr := "{}"
-	if len(feilds) > 0 {
-		feildsStr = fmt.Sprintf("{\n%s\n}", strings.Join(feilds, "\n"))
-	}
-	output, err := t.Execute(map[string]any{
-		"upperStartCamelObject": table.Name.ToCamel(),
-		"lowerStartCamelObject": stringx.From(table.Name.ToCamel()).Untitle(),
-		"modelImports":          modelImports(g.dir),
-		"feilds":                feildsStr,
-		"time":                  table.ContainsTime(),
-		"sql":                   table.ContainsSql(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return output, nil
-}
-
-func (g *defaultGenerator) executeModelCommonTest(table Table) (*bytes.Buffer, error) {
-	text, err := pathx.LoadTemplate(category, modelTestCommonTemplateFile, template.ModelTestCommon)
-	if err != nil {
-		return nil, err
-	}
-	t := util.With("model").
-		Parse(text).
-		GoFmt(true)
-	feilds := make([]string, 0)
-	for _, field := range table.Fields {
-		feilds = append(feilds, fmt.Sprintf("%s: %s,", field.Name.ToCamel(), GetTypeDefaultValue(field.DataType)))
-	}
-	feildsStr := "{}"
-	if len(feilds) > 0 {
-		feildsStr = fmt.Sprintf("{\n%s\n}", strings.Join(feilds, "\n"))
-	}
-	output, err := t.Execute(map[string]any{
-		"upperStartCamelObject": table.Name.ToCamel(),
-		"lowerStartCamelObject": stringx.From(table.Name.ToCamel()).Untitle(),
-		"modelImports":          modelImports(g.dir),
-		"feilds":                feildsStr,
-		"time":                  table.ContainsTime(),
-		"sql":                   table.ContainsSql(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return output, nil
-}
-
-func GetTypeDefaultValue(name string) string {
-	switch name {
-	// 整型及别名（包括有符号、无符号、指针类型）
-	case "int", "int8", "int16", "int32", "int64",
-		"uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
-		return "0"
-	// 浮点型
-	case "float32", "float64":
-		return "0.0"
-	// 字符串
-	case "string":
-		return "\"\""
-	// 布尔值
-	case "bool":
-		return "false"
-	// 复数类型
-	case "complex64", "complex128":
-		return fmt.Sprintf("%v", complex(0, 0))
-	// 空结构体默认值
-	case "time.Time":
-		return "time.Unix(0, 0).Local()"
-	default:
-		if strings.HasPrefix(name, "*") {
-			return fmt.Sprintf("%s{}", strings.Replace(name, "*", "&", 1))
-		}
-		return fmt.Sprintf("%s{}", name)
-	}
-}
-
-func modelImports(base string) string {
-	tmp := make([]string, 0)
-	for i := 0; i < 10; i++ {
-		tmp = append(tmp, filepath.Base(base))
-		base = filepath.Dir(base)
-		filename := filepath.Join(base, "go.mod")
-		if pathx.FileExists(filename) {
-			f, _ := os.Open(filename)
-			line, _ := textproto.NewReader(bufio.NewReader(f)).ReadLine()
-			f.Close()
-			s := strings.Split(line, " ")
-			if len(s) == 2 {
-				slices.Reverse(tmp)
-				return strings.Join(append([]string{s[1]}, tmp...), "/")
-			}
-			return ""
-		}
-	}
-	return ""
 }
 
 func wrapWithRawString(v string, postgreSql bool) string {
